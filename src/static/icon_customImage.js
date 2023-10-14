@@ -1,7 +1,7 @@
 var myMap;
 var clusterer;
 
-ymaps.ready(function () {
+ymaps.ready(function showAtm() {
     myMap = new ymaps.Map('map', {
         center: [55.751574, 37.573856],
         zoom: 9
