@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "vtb-proj-web"
+version = "0.1.0"
+description = ""
+authors = ["iriska"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.103.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
