@@ -18,10 +18,31 @@
             margin: 0;
         }
     </style>
+    <link rel="stylesheet" href="map_styles.css">
+    <!--Подключения для виджета чата-->
+    <script src="dialog.js" defer></script>
+    <link rel="stylesheet" href="dialog_styles.css">
 </head>
 
 <body>
     <div id="map"></div>
+    <!--Плоскость виджета-->
+    <div class="chat-widget">
+        <!--Зона оглавления-->
+        <div class="info-area">
+            <img class="logo" src="/images/logo.png" id="vtb_chat_logo" alt="Логотип">
+            <h3 class="chat-title">Чат-бот</h3>
+        </div>
+        <!--Зона сообщений-->
+        <div class="chat-area">
+            <ul class="list-group list-group-flush" id="list_messages"></ul>
+        </div>
+        <!--Зона взаимодействия -->
+        <div class="interaction-area">
+            <input class="message-input" type="text" id="dialog_input" placeholder="Введите ваше сообщение...">
+            <button class="send-button" id="button_send_message">Отправить</button>
+        </div>
+    </div>
 </body>
 
 </html>
