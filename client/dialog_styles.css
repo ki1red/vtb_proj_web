@@ -1,0 +1,47 @@
+/* Логотип ВТБ в правом верхнем углу */
+#vtb_chat_logo {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  max-width: 32px;
+  height: auto;
+}
+
+/* Вся плоскость виджете */
+.chat-widget {
+  width: 256px;
+  border: 2px solid black;
+  padding: 5px;
+  border-radius: 20px;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  z-index: 1;
+}
+
+/* Зона заголовка */
+.info-area {
+  position: relative;
+}
+
+/* Заголовок в виджете */
+.chat-title {
+  text-align: center;
+  display: table;
+  margin: auto;
+  font-size: 1.5em;
+  vertical-align: middle;
+}
+
+/* Зона чата */
+.chat-area {
+  height: 256px;
+  overflow: auto;
+  box-shadow: inset 0 0 0 1px black;
+  border-radius: 20px;
+}
+
+/* Зона взаимодействия */
+.interaction-area {
+  height: 64px;
+}
