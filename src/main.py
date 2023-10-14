@@ -1,6 +1,8 @@
+from pprint import pprint
 from fastapi import FastAPI
 import json
 from fastapi.middleware.cors import CORSMiddleware
+from modules.database import Database
 
 app = FastAPI()
 
@@ -15,15 +17,15 @@ app.add_middleware(
 )
 
 
-def get_office_data():
-    with open('data/atms.json', 'r') as file:
-        data = json.load(file)
-    return data
+async def get_office_data():
+    db = Database()
+    data = await db.get_atms_data()
+    return json.loads(data)
 
 
 @app.get("/office")
 async def get_office():
-    return get_office_data()
+    return await get_office_data()
 
 if __name__ == "__main__":
     import uvicorn
