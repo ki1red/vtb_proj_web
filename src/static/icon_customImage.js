@@ -107,7 +107,7 @@ function show_office() {
 
 async function fetchATMData() {
     try {
-        const response = await fetch('http://0.0.0.0:5000/atm');
+        const response = await fetch('https://sokov.bytecode.su/atm');
         const data = await response.json();
         return data;
     } catch (error) {
@@ -118,7 +118,7 @@ async function fetchATMData() {
 
 async function fetchOfficeData() {
     try {
-        const response = await fetch('http://0.0.0.0:5000/office');
+        const response = await fetch('https://sokov.bytecode.su/office');
         const data = await response.json();
         return data;
     } catch (error) {
@@ -132,7 +132,7 @@ async function get_atm_radius() {
     longitude = 37.594665;
     radius = 5;
     try {
-        const response = await fetch('http://0.0.0.0:5000/atm_filter?latitude=55.756192&longitude=37.594665&radius=2');
+        const response = await fetch('https://sokov.bytecode.su/atm_filter?latitude=55.756192&longitude=37.594665&radius=2');
         const data = await response.json();
         return data;
     } catch (error) {
