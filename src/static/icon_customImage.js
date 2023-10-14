@@ -1,7 +1,7 @@
 var myMap;
 var clusterer;
 
-ymaps.ready(function showAtm() {
+function showAtm() {
     myMap = new ymaps.Map('map', {
         center: [55.751574, 37.573856],
         zoom: 9
@@ -19,7 +19,7 @@ ymaps.ready(function showAtm() {
         clusterBalloonContentLayout: 'cluster#balloonAccordion'
     });
 
-    response = get_atm_radius();
+    response = fetchATMData();
     response.then(data => {
         var atms = data.atms;
 
@@ -55,9 +55,9 @@ ymaps.ready(function showAtm() {
 
         myMap.geoObjects.add(clusterer); // Добавляем кластеризатор на карту
     });
-});
+};
 
-
+ymaps.ready(showAtm)
 // банки сами
 function show_office() {
     var MyIconContentLayout = ymaps.templateLayoutFactory.createClass(

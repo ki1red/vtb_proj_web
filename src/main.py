@@ -115,14 +115,13 @@ async def atm_filter(latitude, longitude, radius, required=None):
 
 @app.get("/office_filter")
 async def office_filter(latitude, longitude, radius):
-    """функция для получения банкомата в радиусе пользователя
+    """функция для получения офиса в радиусе пользователя
     с учетом его запроса
 
     Args:
         latitude (_type_): ширина
         longitude (_type_): долгота
         radius (_type_): радиус поиска
-        required (_type_): запрос
 
     Returns:
         _type_: банкоматы, которые могут подойти
