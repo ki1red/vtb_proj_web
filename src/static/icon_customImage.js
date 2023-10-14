@@ -1,37 +1,43 @@
+var myMap;
+var clusterer;
+
 ymaps.ready(function () {
-    var myMap = new ymaps.Map('map', {
+    myMap = new ymaps.Map('map', {
         center: [55.751574, 37.573856],
         zoom: 9
     }, {
         searchControlProvider: 'yandex#search'
     });
 
-    // Создаём макет содержимого.
     var MyIconContentLayout = ymaps.templateLayoutFactory.createClass(
         '<div style="color: #FFFFFF; font-weight: bold;">$[properties.iconContent]</div>'
     );
 
-    // Получаем данные о банкоматах
-    response = fetchOfficeData();
+    clusterer = new ymaps.Clusterer({
+        clusterDisableClickZoom: true,
+        clusterOpenBalloonOnClick: true,
+        clusterBalloonContentLayout: 'cluster#balloonAccordion'
+    });
+
+    response = get_atm_radius();
     response.then(data => {
         var atms = data.atms;
 
         for (var i = 0; i < atms.length; i++) {
             var atm = atms[i];
             var coordinates = [atm.latitude, atm.longitude];
-            var servicesContent = ''; // Создаем строку для содержимого
+            var servicesContent = '';
 
-            // Перебираем услуги банкомата
             for (var service in atm.services) {
                 if (atm.services[service].serviceActivity === "AVAILABLE") {
-                    servicesContent += service + '<br>'; // Добавляем услугу в строку
+                    servicesContent += service + '<br>';
                 }
             }
 
-            // Создаем Placemark
             var placemark = new ymaps.Placemark(coordinates, {
+                clusterCaption: atm.address,
                 hintContent: 'Банкомат',
-                balloonContent: 'Адрес: ' + atm.address + '<br>Доступные услуги:<br>' + servicesContent
+                balloonContent: 'Доступные услуги:<br>' + servicesContent
             }, {
                 iconLayout: 'default#imageWithContent',
                 iconImageHref: 'https://pngicon.ru/file/uploads/geometka.png',
@@ -41,20 +47,40 @@ ymaps.ready(function () {
                 iconContentLayout: MyIconContentLayout
             });
 
-            myMap.geoObjects.add(placemark);
+            clusterer.add(placemark); // Добавляем точку в кластеризатор
+
             console.log("Placemark added.");
         }
+
+        myMap.geoObjects.add(clusterer); // Добавляем кластеризатор на карту
     });
-
 });
-
 
 async function fetchOfficeData() {
     try {
-        const response = await fetch('http://0.0.0.0:5000/office');
+        const response = await fetch('http://0.0.0.0:5000/atm');
         const data = await response.json();
         return data;
     } catch (error) {
         console.error('Произошла ошибка:', error);
     }
+}
+
+async function get_atm_radius() {
+    // функция позволяет получить банкоматы в радиусе
+    latitude = 55.756192;
+    longitude = 37.594665;
+    radius = 5;
+    try {
+        const response = await fetch('http://0.0.0.0:5000/atm_filter?latitude=55.756192&longitude=37.594665&radius=2');
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Произошла ошибка:', error);
+    }
+}
+
+function clearMap() {
+    myMap.geoObjects.removeAll(); // Удаляем все объекты с карты
+    clusterer.removeAll(); // Очищаем кластеризатор
 }
