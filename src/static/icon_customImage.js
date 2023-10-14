@@ -6,12 +6,16 @@ ymaps.ready(function () {
         searchControlProvider: 'yandex#search'
     });
 
-    // Создаём макет содержимого.
     var MyIconContentLayout = ymaps.templateLayoutFactory.createClass(
         '<div style="color: #FFFFFF; font-weight: bold;">$[properties.iconContent]</div>'
     );
 
-    // Получаем данные о банкоматах
+    var clusterer = new ymaps.Clusterer({
+        clusterDisableClickZoom: true,
+        clusterOpenBalloonOnClick: true,
+        clusterBalloonContentLayout: 'cluster#balloonAccordion'
+    });
+
     response = fetchOfficeData();
     response.then(data => {
         var atms = data.atms;
@@ -19,16 +23,14 @@ ymaps.ready(function () {
         for (var i = 0; i < atms.length; i++) {
             var atm = atms[i];
             var coordinates = [atm.latitude, atm.longitude];
-            var servicesContent = ''; // Создаем строку для содержимого
+            var servicesContent = '';
 
-            // Перебираем услуги банкомата
             for (var service in atm.services) {
                 if (atm.services[service].serviceActivity === "AVAILABLE") {
-                    servicesContent += service + '<br>'; // Добавляем услугу в строку
+                    servicesContent += service + '<br>';
                 }
             }
 
-            // Создаем Placemark
             var placemark = new ymaps.Placemark(coordinates, {
                 hintContent: 'Банкомат',
                 balloonContent: 'Адрес: ' + atm.address + '<br>Доступные услуги:<br>' + servicesContent
@@ -41,13 +43,14 @@ ymaps.ready(function () {
                 iconContentLayout: MyIconContentLayout
             });
 
-            myMap.geoObjects.add(placemark);
+            clusterer.add(placemark); // Добавляем точку в кластеризатор
+
             console.log("Placemark added.");
         }
+
+        myMap.geoObjects.add(clusterer); // Добавляем кластеризатор на карту
     });
-
 });
-
 
 async function fetchOfficeData() {
     try {
