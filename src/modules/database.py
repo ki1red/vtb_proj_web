@@ -55,3 +55,54 @@ class Database():
             # Преобразуем данные в JSON и возвращаем
             return json.dumps({"atms": list(atms_data.values())},
                               ensure_ascii=False, indent=4)
+
+    async def get_records_by_atm_id(self, atm_id):
+        async with aiosqlite.connect(self.database_path) as db:
+            # Выполняем запрос к базе данных
+            async with db.execute('SELECT * FROM atm_load WHERE atm_id = ?',
+                                  (atm_id,)) as cursor:
+                records = await cursor.fetchall()
+
+        return records
+
+    async def get_departments_data(self):
+        # Открываем соединение с базой данных
+        async with aiosqlite.connect(self.database_path) as db:
+            # Создаем курсор
+            cursor = await db.cursor()
+
+            # Выполняем SQL-запрос для получения данных
+            await cursor.execute('''
+                SELECT * FROM departments
+            ''')
+
+            # Получаем все строки результата
+            rows = await cursor.fetchall()
+
+            # Создаем список для хранения данных
+            departments_data = []
+
+            for row in rows:
+                data = {
+                    "salePointName": row[1],
+                    "address": row[2],
+                    "status": row[3],
+                    "openHours": json.loads(row[4]),
+                    "rko": row[5],
+                    "openHoursIndividual": json.loads(row[6]),
+                    "officeType": row[7],
+                    "salePointFormat": row[8],
+                    "suoAvailability": row[9],
+                    "hasRamp": row[10],
+                    "latitude": row[11],
+                    "longitude": row[12],
+                    "metroStation": row[13],
+                    "distance": row[14],
+                    "kep": bool(row[15]),
+                    "myBranch": bool(row[16])
+                }
+
+                departments_data.append(data)
+
+            # Преобразуем данные в JSON и возвращаем
+            return departments_data
