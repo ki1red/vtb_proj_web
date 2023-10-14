@@ -62,6 +62,7 @@
     <link rel="stylesheet" href="map_styles.css">
     <!--Подключения для виджета чата-->
     <script src="dialog.js" defer></script>
+    <script src="map.js" defer></script>
     <link rel="stylesheet" href="dialog_styles.css">
 </head>
 
@@ -71,7 +72,7 @@
     <div class="chat-widget">
         <!--Зона оглавления-->
         <div class="info-area">
-            <img class="logo" src="images/logo.png" id="vtb_chat_logo" alt="Логотип">
+            <img class="logo" src="/images/logo.png" id="vtb_chat_logo" alt="Логотип">
             <h3 class="chat-title">Чат-бот</h3>
         </div>
         <!--Зона сообщений-->
@@ -84,6 +85,7 @@
             <button class="send-button" id="button_send_message">Отправить</button>
         </div>
     </div>
+
     <div class="overlay" id="menu">
         <div class="close-btn" onclick="toggleMenu()">X</div> <!-- Кнопка закрытия -->
         <label for="address">Адрес:</label>
@@ -100,6 +102,10 @@
         <input type="checkbox" id="supportsUsd" name="supportsUsd"><br>
         <label for="supportsEur">Поддержка EUR:</label>
         <input type="checkbox" id="supportsEur" name="supportsEur"><br><br>
+        <label for="showerATMs">Показать ATMы:</label>
+        <input type="checkbox" id="showerATMs" name="showerATMs"><br>
+        <label for="showerbanks">Показать банки:</label>
+        <input type="checkbox" id="showerbanks" name="showerbanks"><br>
         <button class="submit-btn" onclick="submitData()">Отправить</button>
     </div>
     <div class="button">
@@ -120,6 +126,7 @@
             toggleMenu();
         }
     </script>
+
 </body>
 
 </html>

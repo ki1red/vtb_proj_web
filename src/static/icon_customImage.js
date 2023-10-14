@@ -1,7 +1,7 @@
 var myMap;
 var clusterer;
 
-ymaps.ready(function () {
+function showAtm() {
     myMap = new ymaps.Map('map', {
         center: [55.751574, 37.573856],
         zoom: 9
@@ -19,7 +19,7 @@ ymaps.ready(function () {
         clusterBalloonContentLayout: 'cluster#balloonAccordion'
     });
 
-    response = get_atm_radius();
+    response = fetchATMData();
     response.then(data => {
         var atms = data.atms;
 
@@ -55,9 +55,9 @@ ymaps.ready(function () {
 
         myMap.geoObjects.add(clusterer); // Добавляем кластеризатор на карту
     });
-});
+};
 
-
+ymaps.ready(showAtm)
 // банки сами
 function show_office() {
     var MyIconContentLayout = ymaps.templateLayoutFactory.createClass(
@@ -107,7 +107,7 @@ function show_office() {
 
 async function fetchATMData() {
     try {
-        const response = await fetch('https://sokov.bytecode.su/atm');
+        const response = await fetch('http://0.0.0.0:5000/atm');
         const data = await response.json();
         return data;
     } catch (error) {
@@ -118,7 +118,7 @@ async function fetchATMData() {
 
 async function fetchOfficeData() {
     try {
-        const response = await fetch('https://sokov.bytecode.su/office');
+        const response = await fetch('http://0.0.0.0:5000/office');
         const data = await response.json();
         return data;
     } catch (error) {
@@ -132,7 +132,7 @@ async function get_atm_radius() {
     longitude = 37.594665;
     radius = 5;
     try {
-        const response = await fetch('https://sokov.bytecode.su/atm_filter?latitude=55.756192&longitude=37.594665&radius=2');
+        const response = await fetch('http://0.0.0.0:5000/atm_filter?latitude=55.756192&longitude=37.594665&radius=2');
         const data = await response.json();
         return data;
     } catch (error) {
