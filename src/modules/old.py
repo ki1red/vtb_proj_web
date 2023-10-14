@@ -1,113 +1,93 @@
-# async def load_json_to_db(json_file, db_name):
-#     # Открываем соединение с базой данных
-#     async with aiosqlite.connect(db_name) as db:
-#         # Создаем курсор
-#         cursor = await db.cursor()
-
-#         # Создаем таблицу atms, если она не существует
-#         await cursor.execute('''
-#             CREATE TABLE IF NOT EXISTS atms (
-#                 id INTEGER PRIMARY KEY,
-#                 address TEXT,
-#                 latitude REAL,
-#                 longitude REAL,
-#                 all_day INTEGER
-#             )
-#         ''')
-
-#         # Создаем таблицу services, если она не существует
-#         await cursor.execute('''
-#             CREATE TABLE IF NOT EXISTS services (
-#                 id INTEGER PRIMARY KEY,
-#                 atm_id INTEGER,
-#                 service_name TEXT,
-#                 capability TEXT,
-#                 activity TEXT,
-#                 FOREIGN KEY (atm_id) REFERENCES atms (id)
-#             )
-#         ''')
-
-#         # Читаем данные из JSON
-#         with open(json_file, 'r') as f:
-#             data = json.load(f)
-
-#         # Итерируемся по банкоматам
-#         for atm in data["atms"]:
-#             # Извлекаем данные
-#             address = atm["address"]
-#             latitude = atm["latitude"]
-#             longitude = atm["longitude"]
-#             all_day = atm["allDay"]
-
-#             # Вставляем данные в таблицу atms и получаем id новой записи
-#             await cursor.execute('''
-#                 INSERT INTO atms (address, latitude, longitude, all_day)
-#                 VALUES (?, ?, ?, ?)
-#             ''', (address, latitude, longitude, all_day))
-#             atm_id = cursor.lastrowid
-
-#             # Итерируемся по службам и вставляем их в таблицу services
-#             for service_name, service_info in atm["services"].items():
-#                 capability = service_info["serviceCapability"]
-#                 activity = service_info["serviceActivity"]
-
-#                 await cursor.execute('''
-#                     INSERT INTO services (atm_id, service_name,
-#                                       capability, activity)
-#                     VALUES (?, ?, ?, ?)
-#                 ''', (atm_id, service_name, capability, activity))
-
-#         # Коммитим изменения
-#         await db.commit()
-
-import sqlite3
-import random
+import aiosqlite
+import json
+import asyncio
 
 
-conn = sqlite3.connect('db.db')
-cursor = conn.cursor()
+async def create_departments_table(db_name):
+    # Открываем соединение с базой данных
+    async with aiosqlite.connect(db_name) as db:
+        # Создаем курсор
+        cursor = await db.cursor()
 
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS atm_load (
-        id INTEGER PRIMARY KEY,
-        atm_id INTEGER,
-        day_of_week INTEGER,
-        hour INTEGER,
-        load INTEGER,
-        FOREIGN KEY (atm_id) REFERENCES atm(id)
-    )
-''')
+        # Создаем таблицу departments, если она не существует
+        await cursor.execute(
+            '''
+            CREATE TABLE IF NOT EXISTS departments (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                sale_point_name TEXT,
+                address TEXT,
+                status TEXT,
+                open_hours TEXT,
+                rko TEXT,
+                open_hours_individual TEXT,
+                office_type TEXT,
+                sale_point_format TEXT,
+                suo_availability TEXT,
+                has_ramp TEXT,
+                latitude REAL,
+                longitude REAL,
+                metro_station TEXT,
+                distance INTEGER,
+                kep INTEGER,
+                my_branch INTEGER
+            )
+            '''
+        )
+
+        # Коммитим изменения
+        await db.commit()
 
 
-# Получаем информацию о банкоматах
-cursor.execute('SELECT id, all_day FROM atms')
-atms = cursor.fetchall()
+async def load_json_to_db(json_file, db_name):
+    # Открываем соединение с базой данных
+    async with aiosqlite.connect(db_name) as db:
+        # Создаем курсор
+        cursor = await db.cursor()
 
-# Заполняем информацию о загруженности
-for atm_id, all_day in atms:
-    for day_of_week in range(1, 8):  # 1-понедельник, 2-вторник, ..., 7-воскресенье
-        for hour in range(24):  # 0-23 часа
-            if all_day == 1 or (10 <= hour <= 16):
-                # Равномерная загруженность от 25% до 35%
-                base_load = random.randint(25, 35)
-            elif (12 <= hour <= 14) or hour == 18:
-                # Пиковая загруженность от 65% до 75%
-                base_load = random.randint(65, 75)
-            else:
-                base_load = 0
+        # Открываем и читаем JSON файл
+        with open(json_file, 'r', encoding='utf-8') as file:
+            data = json.load(file)
 
-            # Добавим небольшой рандом к базовой загруженности
-            random_load = random.randint(-5, 5)
-            # Убеждаемся, что нагрузка не меньше 0
-            load = max(base_load + random_load, 0)
+        # Проходимся по каждому отделению и вставляем его в базу данных
+        for department in data:
+            sale_point_name = department['salePointName']
+            address = department['address']
+            status = department['status']
+            open_hours = json.dumps(department['openHours'])
+            rko = department['rko']
+            open_hours_individual = json.dumps(
+                department['openHoursIndividual'])
+            office_type = department['officeType']
+            sale_point_format = department['salePointFormat']
+            suo_availability = department['suoAvailability']
+            has_ramp = department['hasRamp']
+            latitude = department['latitude']
+            longitude = department['longitude']
+            metro_station = department['metroStation']
+            distance = department['distance']
+            kep = department['kep']
+            my_branch = department['myBranch']
 
-            cursor.execute('''
-                INSERT INTO atm_load (atm_id, day_of_week, hour, load)
-                VALUES (?, ?, ?, ?)
-            ''', (atm_id, day_of_week, hour, load))
+            # Вставляем данные в базу
+            await cursor.execute(
+                '''
+                INSERT INTO departments (
+                    sale_point_name, address, status, open_hours, rko, 
+                    open_hours_individual, office_type, sale_point_format, 
+                    suo_availability, has_ramp, latitude, longitude, 
+                    metro_station, distance, kep, my_branch
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''',
+                (
+                    sale_point_name, address, status, open_hours, rko,
+                    open_hours_individual, office_type, sale_point_format,
+                    suo_availability, has_ramp, latitude, longitude,
+                    metro_station, distance, kep, my_branch
+                )
+            )
 
-# Сохраняем изменения и закрываем соединение с базой данных
-conn.commit()
-conn.close()
-
-print("Информация о загруженности банкоматов успешно заполнена.")
+        # Коммитим изменения
+        await db.commit()
+# asyncio.run(create_departments_table("db.db"))
+asyncio.run(load_json_to_db("offices.txt", "db.db"))
