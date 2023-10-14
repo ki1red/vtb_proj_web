@@ -1,43 +1,57 @@
 import json
 import asyncio
 import aiosqlite
+import os
 
-async def load_json_to_db(json_file, db_name):
-    # Открываем соединение с базой данных
-    async with aiosqlite.connect(db_name) as db:
-        # Создаем курсор
-        cursor = await db.cursor()
+current_directory = os.path.dirname(os.path.realpath(__file__))
+database_path = os.path.join(current_directory, 'db.db')
 
-        # Создаем таблицу, если она не существует
-        await cursor.execute('''
-            CREATE TABLE IF NOT EXISTS atms (
-                address TEXT,
-                latitude REAL,
-                longitude REAL,
-                all_day INTEGER
-            )
-        ''')
 
-        # Читаем данные из JSON
-        with open(json_file, 'r') as f:
-            data = json.load(f)
+class Database():
+    def __init__(self) -> None:
+        current_directory = os.path.dirname(os.path.realpath(__file__))
+        database_path = os.path.join(current_directory, 'db.db')
+        self.database_path = database_path
 
-        # Итерируемся по банкоматам
-        for atm in data["atms"]:
-            # Извлекаем данные
-            address = atm["address"]
-            latitude = atm["latitude"]
-            longitude = atm["longitude"]
-            all_day = atm["allDay"]
+    async def get_atms_data(self):
+        # Открываем соединение с базой данных
+        async with aiosqlite.connect(self.database_path) as db:
+            # Создаем курсор
+            cursor = await db.cursor()
 
-            # Вставляем данные в базу данных
+            # Выполняем SQL-запрос для получения данных
             await cursor.execute('''
-                INSERT INTO atms (address, latitude, longitude, all_day)
-                VALUES (?, ?, ?, ?)
-            ''', (address, latitude, longitude, all_day))
+                SELECT atms.address, atms.latitude, atms.longitude, atms.all_day,
+                    services.service_name, services.capability, services.activity
+                FROM atms
+                JOIN services ON atms.id = services.atm_id
+            ''')
 
-        # Коммитим изменения
-        await db.commit()
+            # Получаем все строки результата
+            rows = await cursor.fetchall()
 
-# Используем функцию
-asyncio.run(load_json_to_db('atms.txt', 'db.db'))
+            # Создаем словарь для хранения данных
+            atms_data = {}
+
+            for row in rows:
+                address, latitude, longitude, all_day, service_name, capability, activity = row
+
+                # Если банкомат еще не включен в результат, добавляем его
+                if address not in atms_data:
+                    atms_data[address] = {
+                        "address": address,
+                        "latitude": latitude,
+                        "longitude": longitude,
+                        "allDay": bool(all_day),
+                        "services": {}
+                    }
+
+                # Добавляем данные о службе к соответствующему банкомату
+                atms_data[address]["services"][service_name] = {
+                    "serviceCapability": capability,
+                    "serviceActivity": activity
+                }
+
+            # Преобразуем данные в JSON и возвращаем
+            return json.dumps({"atms": list(atms_data.values())},
+                              ensure_ascii=False, indent=4)
