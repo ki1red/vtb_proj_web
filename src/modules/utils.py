@@ -27,6 +27,17 @@ def haversine(lat1, lon1, lat2, lon2):
 
 
 def find_atms_in_radius(latitude, longitude, atms_data, radius):
+    """_summary_
+
+    Args:
+        latitude (_type_): ширина
+        longitude (_type_): долгота
+        atms_data (_type_): все банкоматы
+        radius (_type_): радиус поиска
+
+    Returns:
+        dict: подходящие банкоматы
+    """
     result = []
     for atm in atms_data['atms']:
         atm_latitude = atm["latitude"]
@@ -38,3 +49,22 @@ def find_atms_in_radius(latitude, longitude, atms_data, radius):
             result.append(atm)
 
     return result
+
+
+def filter_atms(data, required_services):
+    # Функция для фильтрации банкоматов
+
+    def filter_atm(atm):
+        for service in required_services:
+            if (
+                atm["services"].get(service) is None
+                or atm["services"][service]["serviceActivity"] != "AVAILABLE"
+            ):
+                return False
+        return True
+
+    # Применяем фильтр и получаем отфильтрованный список
+
+    filtered_atms = list(filter(filter_atm, data))
+    # Возвращаем отфильтрованный JSON
+    return filtered_atms

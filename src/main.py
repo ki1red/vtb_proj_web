@@ -3,6 +3,7 @@ from fastapi import FastAPI
 import json
 from fastapi.middleware.cors import CORSMiddleware
 from modules.database import Database
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
@@ -16,6 +17,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.mount("/index", StaticFiles(directory="static", html=True), name="static")
+
 
 async def get_atm_data():
     db = Database()
@@ -23,9 +26,12 @@ async def get_atm_data():
     return json.loads(data)
 
 
-async def get_filter_atm(latitude, longitude, radius):
+async def get_filter_atm(latitude, longitude, radius, required):
     all_atm = await get_atm_data()
     data = utils.find_atms_in_radius(latitude, longitude, all_atm, radius)
+    if required is not None:
+        required_services = required.split(',')
+        data = utils.filter_atms(data, required_services)
     return data
 
 
@@ -40,8 +46,8 @@ async def get_atm():
 
 
 @app.get("/atm_filter")
-async def atm_filter(latitude, longitude, radius):
-    data = await get_filter_atm(latitude, longitude, radius)
+async def atm_filter(latitude, longitude, radius, required=None):
+    data = await get_filter_atm(latitude, longitude, radius, required)
     return {"atms": data}
 
 if __name__ == "__main__":
