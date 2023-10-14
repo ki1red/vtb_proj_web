@@ -16,6 +16,47 @@
             height: 100%;
             padding: 0;
             margin: 0;
+            position: relative;
+            /* Добавляем позиционирование для overlay */
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            /* Выравниваем справа */
+            width: 50%;
+            /* Ширина меню (половина экрана) */
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            /* Прозрачный белый фон */
+            display: none;
+            /* По умолчанию скрыто */
+            z-index: 2;
+            /* Выше карты */
+            padding: 60px;
+
+            box-sizing: border-box;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            /* Выравниваем справа */
+            font-size: 24pt;
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            margin-top: 10px;
+        }
+
+        .button {
+            position: fixed;
+            top: 10%;
+            left: 10px;
+            z-index: 3;
         }
     </style>
     <link rel="stylesheet" href="map_styles.css">
@@ -43,6 +84,44 @@
             <button class="send-button" id="button_send_message">Отправить</button>
         </div>
     </div>
+
+    <div class="overlay" id="menu">
+        <div class="close-btn" onclick="toggleMenu()">X</div> <!-- Кнопка закрытия -->
+        <label for="address">Адрес:</label>
+        <input type="text" id="address" name="address"><br><br>
+        <label for="wheelchair">Колясочники:</label>
+        <input type="checkbox" id="wheelchair" name="wheelchair"><br>
+        <label for="blind">Слабовидящие:</label>
+        <input type="checkbox" id="blind" name="blind"><br>
+        <label for="nfcForBankCards">NFC для банковских карт:</label>
+        <input type="checkbox" id="nfcForBankCards" name="nfcForBankCards"><br>
+        <label for="qrRead">QR-коды:</label>
+        <input type="checkbox" id="qrRead" name="qrRead"><br>
+        <label for="supportsUsd">Поддержка USD:</label>
+        <input type="checkbox" id="supportsUsd" name="supportsUsd"><br>
+        <label for="supportsEur">Поддержка EUR:</label>
+        <input type="checkbox" id="supportsEur" name="supportsEur"><br><br>
+        <button class="submit-btn" onclick="submitData()">Отправить</button>
+    </div>
+    <div class="button">
+        <button onclick="toggleMenu()">Меню</button>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            var menu = document.getElementById("menu");
+            menu.style.display = (menu.style.display === "block") ? "none" : "block";
+            var button = document.querySelector('.button button');
+            button.style.display = (button.style.display === "none") ? "block" : "none";
+        }
+
+        function toggleMenuButton() {
+            var button = document.querySelector('.button button');
+            button.innerText = (button.innerText === "Отобразить меню") ? "Скрыть меню" : "Отобразить меню";
+            toggleMenu();
+        }
+    </script>
+
 </body>
 
 </html>

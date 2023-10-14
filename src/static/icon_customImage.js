@@ -61,7 +61,7 @@ ymaps.ready(function () {
 // банки сами
 function show_office() {
     var MyIconContentLayout = ymaps.templateLayoutFactory.createClass(
-        '<div style="color: #FFFFFF; font-weight: bold;">$[properties.iconContent]</div>'
+        '<div style="color: #ff0000; font-weight: bold;">$[properties.iconContent]</div>'
     );
 
     clusterer = new ymaps.Clusterer({
@@ -72,16 +72,17 @@ function show_office() {
 
     response = fetchOfficeData();
     response.then(data => {
-        var office = data.office;
+        var offices = data.office; // Изменил название переменной на множественное число
+        for (var i = 0; i < offices.length; i++) {
+            var currentOffice = offices[i]; // Изменил название переменной
 
-        for (var i = 0; i < office.length; i++) {
-            var office = office[i];
-            var coordinates = [office.latitude, office.longitude];
+            // Остальной код без изменений...
 
+            var coordinates = [currentOffice.latitude, currentOffice.longitude];
             var placemark = new ymaps.Placemark(coordinates, {
-                clusterCaption: office.address,
+                clusterCaption: currentOffice.address,
                 hintContent: 'Отделение банка',
-                balloonContent: 'Тут будет описание'
+                balloonContent: currentOffice.salePointName,
             }, {
                 iconLayout: 'default#imageWithContent',
                 iconImageHref: 'https://pngicon.ru/file/uploads/geometka.png',
@@ -91,13 +92,13 @@ function show_office() {
                 iconContentLayout: MyIconContentLayout
             });
 
-            clusterer.add(placemark); // Добавляем точку в кластеризатор
-
+            clusterer.add(placemark);
             console.log("Placemark added.");
         }
 
-        myMap.geoObjects.add(clusterer); // Добавляем кластеризатор на карту
+        myMap.geoObjects.add(clusterer);
     });
+
 };
 
 
