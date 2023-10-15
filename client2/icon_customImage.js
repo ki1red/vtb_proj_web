@@ -1,39 +1,7 @@
 var myMap;
 var clusterer;
 
-async function sendGetRequest(latitude, longitude, radius, requiredServices) {
-    const url = `http://0.0.0.0:5000/atm_filter?latitude=${latitude}&longitude=${longitude}&radius=${radius}&required=${requiredServices}`;
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Ошибка:', error);
-    }
-}
-function submitData() {
-    // Получаем значения из формы
-    const latitude = document.getElementById("latitude").value;
-    const longitude = document.getElementById("longitude").value;
-    const radius = document.getElementById("radius").value;
-    const requiredServices = document.getElementById("requiredServices").value;
-
-    // Вызываем функцию sendGetRequest с полученными значениями
-    sendGetRequest(latitude, longitude, radius, requiredServices)
-        .then(data => {
-            console.log(data);
-        })
-        .catch(error => {
-            console.error(error);
-        });
-    
-}
-
-let sendFormButton = document.getElementById("sendFormButton");
-sendFormButton.addEventListener("click", submitData());
-
-function showAtm() {
-    clearMap();
+ymaps.ready(function () {
     myMap = new ymaps.Map('map', {
         center: [55.751574, 37.573856],
         zoom: 9
@@ -51,11 +19,7 @@ function showAtm() {
         clusterBalloonContentLayout: 'cluster#balloonAccordion'
     });
 
-    const latitude = document.getElementById("latitude").value;
-    const longitude = document.getElementById("longitude").value;
-    const radius = document.getElementById("radius").value;
-    const requiredServices = document.getElementById("requiredServices").value;
-    response = sendGetRequest(latitude, longitude, radius, requiredServices);
+    response = get_atm_radius();
     response.then(data => {
         var atms = data.atms;
 
@@ -91,9 +55,9 @@ function showAtm() {
 
         myMap.geoObjects.add(clusterer); // Добавляем кластеризатор на карту
     });
-};
+});
 
-ymaps.ready(showAtm)
+
 // банки сами
 function show_office() {
     var MyIconContentLayout = ymaps.templateLayoutFactory.createClass(
@@ -143,7 +107,7 @@ function show_office() {
 
 async function fetchATMData() {
     try {
-        const response = await fetch('http://0.0.0.0:5000/atm');
+        const response = await fetch('https://sokov.bytecode.su/atm');
         const data = await response.json();
         return data;
     } catch (error) {
@@ -154,7 +118,7 @@ async function fetchATMData() {
 
 async function fetchOfficeData() {
     try {
-        const response = await fetch('http://0.0.0.0:5000/office');
+        const response = await fetch('https://sokov.bytecode.su/office');
         const data = await response.json();
         return data;
     } catch (error) {
@@ -168,7 +132,7 @@ async function get_atm_radius() {
     longitude = 37.594665;
     radius = 5;
     try {
-        const response = await fetch('http://0.0.0.0:5000/atm_filter?latitude=55.756192&longitude=37.594665&radius=2');
+        const response = await fetch('https://sokov.bytecode.su/atm_filter?latitude=55.756192&longitude=37.594665&radius=2');
         const data = await response.json();
         return data;
     } catch (error) {
@@ -180,7 +144,3 @@ function clearMap() {
     myMap.geoObjects.removeAll(); // Удаляем все объекты с карты
     clusterer.removeAll(); // Очищаем кластеризатор
 }
-
-
-
-export { sendGetRequest };
