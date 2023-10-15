@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Карта</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&amp;apikey=21031d1d-8e93-40cf-9871-743d3a9ad834"
+        type="text/javascript"></script>
+    <script src="icon_customImage.js" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        html,
+        body,
+        #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+            position: relative;
+            /* Добавляем позиционирование для overlay */
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            /* Выравниваем справа */
+            width: 50%;
+            /* Ширина меню (половина экрана) */
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            /* Прозрачный белый фон */
+            display: none;
+            /* По умолчанию скрыто */
+            z-index: 2;
+            /* Выше карты */
+            padding: 60px;
+
+            box-sizing: border-box;
+        }
+
+        .submit-btn {
+            margin-top: 10px;
+        }
+
+        .button {
+            position: fixed;
+            top: 10%;
+            left: 10px;
+            z-index: 3;
+        }
+
+        .list-group-item {
+            margin-bottom: 5px;
+        }
+
+        .chat-icon {
+            position: fixed;
+            bottom: 55px;
+            right: 35px;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .chat-icon img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+        .close-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24pt;
+            cursor: pointer;
+        }
+    </style>
+    <link rel="stylesheet" href="map_styles.css">
+    <!--Подключения для виджета чата-->
+    <script src="dialog.js" defer></script>
+    <script src="map.js" defer></script>
+    <link rel="stylesheet" href="dialog_styles.css">
+</head>
+
+<body>
+    <div id="map"></div>
+    <!--Иконка чата -->
+    <div class="chat-icon" onclick="toggleChat()">
+        <img src="./images/chat.PNG" alt="Чат иконка">
+    </div>
+    <!--Плоскость виджета-->
+    <div class="chat-widget" style="background-color: whitesmoke; display: none;">
+
+        <!--Зона оглавления-->
+        <div class="info-area">
+            <img class="logo" src="images/logo.png" id="vtb_chat_logo" alt="Логотип">
+            <h3 class="chat-title">Чат-бот</h3>
+            <!--Кнопка закрытия-->
+            <div class="close-icon-2" onclick="toggleChat()">
+                <img src="./images/close.PNG" alt="закрыть чат">
+            </div>
+        </div>
+        <!--Зона сообщений-->
+        <div class="chat-area">
+            <ul class="list-group" id="list_messages" style="font-size: small; padding-left: 15px;">
+            </ul>
+        </div>
+
+        <!--Зона взаимодействия -->
+        <div class="interaction-area" style="padding: 5px;">
+            <div class="input-container">
+                <input class=" message-input" type="text" id="dialog_input" placeholder="Введите ваше сообщение...">
+                <button class="send-button" id="button_send_message"><img src="./images/send.PNG"
+                        alt="Отправить сообщение"></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="menu">
+
+
+        <label for="address">Адрес:</label>
+        <input type="text" id="address" name="address"><br><br>
+        <label for="wheelchair">Колясочники:</label>
+        <input type="checkbox" id="wheelchair" name="wheelchair"><br>
+        <label for="blind">Слабовидящие:</label>
+        <input type="checkbox" id="blind" name="blind"><br>
+        <label for="nfcForBankCards">NFC для банковских карт:</label>
+        <input type="checkbox" id="nfcForBankCards" name="nfcForBankCards"><br>
+        <label for="qrRead">QR-коды:</label>
+        <input type="checkbox" id="qrRead" name="qrRead"><br>
+        <label for="supportsUsd">Поддержка USD:</label>
+        <input type="checkbox" id="supportsUsd" name="supportsUsd"><br>
+        <label for="supportsEur">Поддержка EUR:</label>
+        <input type="checkbox" id="supportsEur" name="supportsEur"><br><br>
+        <label for="showerATMs">Показать ATMы:</label>
+        <input type="checkbox" id="showerATMs" name="showerATMs"><br>
+        <label for="showerbanks">Показать банки:</label>
+        <input type="checkbox" id="showerbanks" name="showerbanks"><br>
+        <button class="submit-btn" onclick="submitData()">Отправить</button>
+    </div>
+    <div class="button">
+        <button onclick="toggleMenu()">Меню</button>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            var menu = document.getElementById("menu");
+            menu.style.display = (menu.style.display === "block") ? "none" : "block";
+            var button = document.querySelector('.button button');
+            button.style.display = (button.style.display === "none") ? "block" : "none";
+        }
+
+        function toggleMenuButton() {
+            var button = document.querySelector('.button button');
+            button.innerText = (button.innerText === "Отобразить меню") ? "Скрыть меню" : "Отобразить меню";
+            toggleMenu();
+        }
+
+        function toggleChat() {
+            var chatWindow = document.querySelector('.chat-widget');
+            chatWindow.style.display = (chatWindow.style.display === "block") ? "none" : "block";
+        }
+    </script>
+
+</body>
+
+</html>
