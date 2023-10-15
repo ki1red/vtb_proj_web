@@ -7,79 +7,9 @@
     <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&amp;apikey=21031d1d-8e93-40cf-9871-743d3a9ad834"
         type="text/javascript"></script>
     <script src="icon_customImage.js" type="text/javascript"></script>
-    <script> import { sendGetRequest } from 'icon_customImage.js'; </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        html,
-        body,
-        #map {
-            width: 100%;
-            height: 100%;
-            padding: 0;
-            margin: 0;
-            position: relative;
-            /* Добавляем позиционирование для overlay */
-        }
-
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            /* Выравниваем справа */
-            width: 50%;
-            /* Ширина меню (половина экрана) */
-            height: 100%;
-            background: rgba(255, 255, 255, 0.9);
-            /* Прозрачный белый фон */
-            display: none;
-            /* По умолчанию скрыто */
-            z-index: 2;
-            /* Выше карты */
-            padding: 60px;
-
-            box-sizing: border-box;
-        }
-
-        .submit-btn {
-            margin-top: 10px;
-        }
-
-        .button {
-            position: fixed;
-            top: 10%;
-            left: 10px;
-            z-index: 3;
-        }
-
-        .list-group-item {
-            margin-bottom: 5px;
-        }
-
-        .chat-icon {
-            position: fixed;
-            bottom: 55px;
-            right: 35px;
-            width: 60px;
-            height: 60px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        .chat-icon img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-        }
-
-        .close-icon {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 24pt;
-            cursor: pointer;
-        }
+        /* Ваш CSS-код */
     </style>
     <link rel="stylesheet" href="map_styles.css">
     <!--Подключения для виджета чата-->
@@ -98,20 +28,9 @@
     <div class="chat-widget" style="background-color: whitesmoke; display: none;">
 
         <!--Зона оглавления-->
-        <div class="info-area">
-            <img class="logo" src="images/logo.png" id="vtb_chat_logo" alt="Логотип">
-            <h3 class="chat-title">Чат-бот</h3>
-            <!--Кнопка закрытия-->
-            <div class="close-icon-2" onclick="toggleChat()">
-                <img src="./images/close.PNG" alt="закрыть чат">
-            </div>
-        </div>
+        <!-- ... -->
         <!--Зона сообщений-->
-        <div class="chat-area">
-            <ul class="list-group" id="list_messages" style="font-size: small; padding-left: 15px;">
-            </ul>
-        </div>
-
+        <!-- ... -->
         <!--Зона взаимодействия -->
         <div class="interaction-area" style="padding: 5px;">
             <div class="input-container">
@@ -131,13 +50,6 @@
         <input type="text" id="longitude" name="longitude"><br><br>
         <label for="radius">Радиус:</label>
         <input type="text" id="radius" name="radius"><br><br>
-        <p>Возможные услуги:<br>
-            wheelchair<br>
-            blind<br>
-            nfcForBankCards<br>
-            qrRead<br>
-            supportsUsd<br>
-            supportsEur</p>
         <label for="requiredServices">Необходимые услуги:</label>
         <input type="text" id="requiredServices" name="requiredServices"><br><br>
         <button class="submit-btn" onclick="submitData()">Отправить</button>
@@ -165,7 +77,17 @@
             chatWindow.style.display = (chatWindow.style.display === "block") ? "none" : "block";
         }
 
+        async function sendGetRequest(latitude, longitude, radius, requiredServices) {
+            const url = `http://0.0.0.0:5000/atm_filter?latitude=${latitude}&longitude=${longitude}&radius=${radius}&required=${requiredServices}`;
 
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Ошибка:', error);
+            }
+        }
 
         function submitData() {
             // Получаем значения из формы
@@ -184,7 +106,6 @@
                 });
         }
     </script>
-
 
 </body>
 

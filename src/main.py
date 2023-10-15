@@ -50,7 +50,7 @@ async def get_filter_atm(latitude, longitude, radius, required):
     while True:
         data = await utils.find_atms_in_radius(latitude, longitude, all_atm,
                                                radius)
-        if required is not None:
+        if required is not None and required != "":
             required_services = required.split(',')
             data = await utils.filter_atms(data, required_services)
         if len(data) < 1 and attempt < 5:

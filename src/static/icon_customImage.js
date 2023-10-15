@@ -1,6 +1,18 @@
 var myMap;
 var clusterer;
 
+async function sendGetRequest(latitude, longitude, radius, requiredServices) {
+    const url = `http://0.0.0.0:5000/atm_filter?latitude=${latitude}&longitude=${longitude}&radius=${radius}&required=${requiredServices}`;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Ошибка:', error);
+    }
+}
+
 function showAtm() {
     myMap = new ymaps.Map('map', {
         center: [55.751574, 37.573856],
@@ -144,3 +156,7 @@ function clearMap() {
     myMap.geoObjects.removeAll(); // Удаляем все объекты с карты
     clusterer.removeAll(); // Очищаем кластеризатор
 }
+
+
+
+export { sendGetRequest };
