@@ -135,25 +135,22 @@ class Database():
 
     async def get_atm_load_data(self, atm_id, day_of_week, minute):
         async with aiosqlite.connect(self.database_path) as db:
-            cursor = await db.cursor()
-
-            await cursor.execute('''
+            async with db.execute('''
                 SELECT load FROM atm_load 
                 WHERE atm_id = ? AND day_of_week = ? AND minute = ?
-            ''', (atm_id, day_of_week, minute))
+            ''', (atm_id, day_of_week, minute)) as cursor:
 
-            result = await cursor.fetchall()  # Используем fetchall для получения всех значений
-
-            if result:
-                return [row[0] for row in result]  # Возвращаем массив значений
-            else:
-                return None
+                result = await cursor.fetchall()
+                return [row[0] for row in result] if result else None
 
     async def get_id_by_location(self, x, y):
         async with aiosqlite.connect(self.database_path) as db:
             cursor = await db.cursor()
 
             await cursor.execute('''
-                SELECT load FROM atm
-                WHERE atm_id = ? AND day_of_week = ? AND minute = ?
-            ''', (atm_id, day_of_week, minute))
+                SELECT id FROM atms
+                WHERE latitude = ? AND longitude = ?
+                LIMIT 1
+            ''', (x, y))
+            result = await cursor.fetchone()
+            return result[0] if result is not None else None

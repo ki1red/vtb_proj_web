@@ -153,13 +153,10 @@ async def workload_atm(atm_id):
     # Переводим часы в минуты и складываем с минутами
     time = (hours * 60 + minutes) / 5
     db = Database()
-    print(num_weak)
     this_five_minutes_last_weeks = await db.get_atm_load_data(
         atm_id, num_weak, int(time))
     last_five_minutes = await db.get_atm_load_data(
         atm_id, num_weak, int(time) - 5)
-    print(this_five_minutes_last_weeks)
-    print(last_five_minutes)
     # тут мы считает среднее значение в массиве и умножаем на коэф 0.3
     val1 = sum(
         this_five_minutes_last_weeks) // len(this_five_minutes_last_weeks) * 0.3
@@ -170,5 +167,43 @@ async def workload_atm(atm_id):
 
 
 async def add_workload(data):
-    for i in data:
-        pass
+    db = Database()
+    for i in data[:5]:
+        id = await db.get_id_by_location(i["latitude"], i["longitude"])
+        i['workload'] = await workload_atm(id)
+    return data[:5]
+
+
+def sort_atms(atm):
+    return atm["travel_time_walk"], atm["workload"]
+
+
+def time_wait(atm):
+    for i in atm:
+        wait = "2"
+
+        workload = i["workload"]
+
+        if workload >= 10 and workload < 20:
+            wait = "5"
+        elif workload >= 20 and workload < 30:
+            wait = "10"
+        elif workload >= 30 and workload < 40:
+            wait = "12"
+        elif workload >= 40 and workload < 50:
+            wait = "13"
+        elif workload >= 50 and workload < 60:
+            wait = "15"
+        elif workload >= 60 and workload < 70:
+            wait = "17"
+        elif workload >= 70 and workload < 80:
+            wait = "19"
+        elif workload >= 80 and workload < 90:
+            wait = "20"
+        elif workload >= 90 and workload < 100:
+            wait = "22"
+        elif workload >= 100:
+            wait = "25"
+
+        i["time_wait"] = wait
+    return atm

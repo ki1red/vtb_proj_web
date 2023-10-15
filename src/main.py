@@ -58,7 +58,12 @@ async def get_filter_atm(latitude, longitude, radius, required):
             attempt += 1
             continue
         data = await utils.add_distance_to_json(data, (latitude, longitude))
-        data = await utils.workload_atm(data)
+        # первые 5 по меньшему пути
+        sorted_atms = sorted(data, key=lambda x: x["travel_time_walk"])
+        top_5_atms = sorted_atms[:5]
+        data = await utils.add_workload(top_5_atms)
+        sorted_atms = sorted(data, key=utils.sort_atms)
+        all_data = utils.time_wait(sorted_atms)
         return data
 
 
@@ -140,6 +145,7 @@ async def get_office():
         json: все офисы втб
     """
     return await get_office_data()
+
 
 if __name__ == "__main__":
     import uvicorn
