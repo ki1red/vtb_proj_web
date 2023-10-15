@@ -106,3 +106,28 @@ class Database():
 
             # Преобразуем данные в JSON и возвращаем
             return departments_data
+
+    async def get_atm_load_data(self, atm_id, day_of_week, minute):
+        async with aiosqlite.connect(self.database_path) as db:
+            cursor = await db.cursor()
+
+            await cursor.execute('''
+                SELECT load FROM atm_load 
+                WHERE atm_id = ? AND day_of_week = ? AND minute = ?
+            ''', (atm_id, day_of_week, minute))
+
+            result = await cursor.fetchall()  # Используем fetchall для получения всех значений
+
+            if result:
+                return [row[0] for row in result]  # Возвращаем массив значений
+            else:
+                return None
+
+    async def get_id_by_location(self, x, y):
+        async with aiosqlite.connect(self.database_path) as db:
+            cursor = await db.cursor()
+
+            await cursor.execute('''
+                SELECT load FROM atm
+                WHERE atm_id = ? AND day_of_week = ? AND minute = ?
+            ''', (atm_id, day_of_week, minute))

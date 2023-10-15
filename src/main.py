@@ -57,6 +57,8 @@ async def get_filter_atm(latitude, longitude, radius, required):
             radius = float(radius) + 0.3
             attempt += 1
             continue
+        data = await utils.add_distance_to_json(data, (latitude, longitude))
+        data = await utils.workload_atm(data)
         return data
 
 

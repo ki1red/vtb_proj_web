@@ -1,11 +1,13 @@
 from modules.database import Database
+from modules import utils
 import asyncio
 
 
 async def main():
-    db = Database()
-    data = await db.get_records_by_atm_id(7)
-    print(data)
+    time = "17:59"
+    for atm in range(1, 10):
+        data = await utils.workload_atm(atm)
+        print(f"Банкомат {atm} {time} загруженность", data)
 
 
 if __name__ == "__main__":

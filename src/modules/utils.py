@@ -1,4 +1,8 @@
 import math
+from modules.yamaps_api import calculate_distance_and_time
+from modules.database import Database
+from datetime import datetime
+import pytz
 
 
 def haversine(lat1, lon1, lat2, lon2):
@@ -112,3 +116,59 @@ def get_current_load(date, database):
         len(relevant_records) if relevant_records else 0
 
     return average_load
+
+
+async def add_distance_to_json(data, user_cord):
+    """ф-ия для расчета расстояния между пользователем и банкоматом
+
+    Args:
+        data (list[dict]): Список словарей с информацией о банкоматах
+    """
+    for i in data:
+        time_to_move = await calculate_distance_and_time(user_cord, (i['latitude'],
+                                                                     i['longitude']))
+
+        # Добавляем информацию о времени в словарь i
+        i['travel_time_car'] = time_to_move[0]
+        i['travel_time_walk'] = time_to_move[1]
+        i['travel_time_bike'] = time_to_move[2]
+
+    return data
+
+
+def get_day_of_week():
+    today = datetime.today()
+    day_of_week = today.isoweekday()  # Получаем текущий день недели (пн - 1, вс - 7)
+
+    return day_of_week
+
+
+async def workload_atm(atm_id):
+    moscow_timezone = pytz.timezone('Europe/Moscow')
+    num_weak = get_day_of_week()
+    current_time = datetime.now(moscow_timezone)
+    formatted_time = current_time.strftime("%H:%M")
+    # Разбиваем время на часы и минуты и преобразуем их в целые числа
+    hours, minutes = map(int, formatted_time.split(':'))
+    # Переводим часы в минуты и складываем с минутами
+    time = (hours * 60 + minutes) / 5
+    db = Database()
+    print(num_weak)
+    this_five_minutes_last_weeks = await db.get_atm_load_data(
+        atm_id, num_weak, int(time))
+    last_five_minutes = await db.get_atm_load_data(
+        atm_id, num_weak, int(time) - 5)
+    print(this_five_minutes_last_weeks)
+    print(last_five_minutes)
+    # тут мы считает среднее значение в массиве и умножаем на коэф 0.3
+    val1 = sum(
+        this_five_minutes_last_weeks) // len(this_five_minutes_last_weeks) * 0.3
+    # тут мы берём последние пять минут и умножаем на коэф 0.7
+    val2 = last_five_minutes[-1] * 0.7
+    print(val1+val2)
+    return val1+val2
+
+
+async def add_workload(data):
+    for i in data:
+        pass
