@@ -1,10 +1,16 @@
 /* Логотип ВТБ в правом верхнем углу */
 #vtb_chat_logo {
   position: absolute;
-  right: 5px;
+  left: 5px;
   top: 5px;
   max-width: 32px;
   height: auto;
+}
+
+#list_messages {
+  overflow-x: hidden;
+  overflow-y: scroll;
+  scroll-behavior: smooth;
 }
 
 /* Вся плоскость виджете */
@@ -17,6 +23,7 @@
   bottom: 0;
   right: 0;
   z-index: 1;
+  background-color: rgba(255, 255, 255, 0.8);
 }
 
 /* Зона заголовка */
@@ -35,13 +42,49 @@
 
 /* Зона чата */
 .chat-area {
-  height: 256px;
-  overflow: auto;
+  position: relative;
+  top: 10px;
+  height: 265px;
+  overflow-y: scroll;
   box-shadow: inset 0 0 0 1px black;
   border-radius: 20px;
+  scroll-behavior: smooth;
+}
+
+/* Кнопка закрытия чата */
+.close-icon-2 {
+  position: absolute;
+  top: 1px;
+  right: 10px;
+  width: 24px;
+  height: auto;
+  cursor: pointer;
+}
+
+.close-icon-2 img {
+  width: 100%;
+  height: 100%;
+}
+
+
+/* Стили для прокрутки контейнера чата */
+.chat-area::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-area::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 4px;
+}
+
+.chat-area::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+  border-radius: 4px;
 }
 
 /* Зона взаимодействия */
 .interaction-area {
+  position: relative;
+  top: 10px;
   height: 64px;
 }

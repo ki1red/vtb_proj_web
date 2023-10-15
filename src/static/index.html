@@ -39,15 +39,6 @@
             box-sizing: border-box;
         }
 
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            /* Выравниваем справа */
-            font-size: 24pt;
-            cursor: pointer;
-        }
-
         .submit-btn {
             margin-top: 10px;
         }
@@ -57,6 +48,36 @@
             top: 10%;
             left: 10px;
             z-index: 3;
+        }
+
+        .list-group-item {
+            margin-bottom: 5px;
+        }
+
+        .chat-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .chat-icon img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+        .close-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24pt;
+            cursor: pointer;
         }
     </style>
     <link rel="stylesheet" href="map_styles.css">
@@ -68,26 +89,38 @@
 
 <body>
     <div id="map"></div>
+    <!--Иконка чата -->
+    <div class="chat-icon" onclick="toggleChat()">
+        <img src="./images/chat.PNG" alt="Чат иконка">
+    </div>
     <!--Плоскость виджета-->
-    <div class="chat-widget">
+    <div class="chat-widget" style="background-color: whitesmoke; display: none;">
+
         <!--Зона оглавления-->
         <div class="info-area">
-            <img class="logo" src="/images/logo.png" id="vtb_chat_logo" alt="Логотип">
+            <img class="logo" src="images/logo.png" id="vtb_chat_logo" alt="Логотип">
             <h3 class="chat-title">Чат-бот</h3>
+            <!--Кнопка закрытия-->
+            <div class="close-icon-2" onclick="toggleChat()">
+                <img src="./images/close.PNG" alt="закрыть чат">
+            </div>
         </div>
         <!--Зона сообщений-->
         <div class="chat-area">
-            <ul class="list-group list-group-flush" id="list_messages"></ul>
+            <ul class="list-group" id="list_messages" style="font-size: small; padding-left: 15px;">
+            </ul>
         </div>
+
         <!--Зона взаимодействия -->
-        <div class="interaction-area">
-            <input class="message-input" type="text" id="dialog_input" placeholder="Введите ваше сообщение...">
+        <div class="interaction-area" style="padding: 5px;">
+            <input class=" message-input" type="text" id="dialog_input" placeholder="Введите ваше сообщение...">
             <button class="send-button" id="button_send_message">Отправить</button>
         </div>
     </div>
 
     <div class="overlay" id="menu">
-        <div class="close-btn" onclick="toggleMenu()">X</div> <!-- Кнопка закрытия -->
+
+
         <label for="address">Адрес:</label>
         <input type="text" id="address" name="address"><br><br>
         <label for="wheelchair">Колясочники:</label>
@@ -124,6 +157,11 @@
             var button = document.querySelector('.button button');
             button.innerText = (button.innerText === "Отобразить меню") ? "Скрыть меню" : "Отобразить меню";
             toggleMenu();
+        }
+
+        function toggleChat() {
+            var chatWindow = document.querySelector('.chat-widget');
+            chatWindow.style.display = (chatWindow.style.display === "block") ? "none" : "block";
         }
     </script>
 
