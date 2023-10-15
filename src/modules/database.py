@@ -2,9 +2,35 @@ import json
 import asyncio
 import aiosqlite
 import os
+import requests
+import requests
 
-current_directory = os.path.dirname(os.path.realpath(__file__))
+current_directory = os.path.dirname(os.path.abspath(__file__))
 database_path = os.path.join(current_directory, 'db.db')
+
+if not os.path.exists(database_path):
+    url = 'https://drive.google.com/uc?export=download&id=1SJaAkKZKEainP7Z22H4j8IGnIuxdlE3i&confirm=t&uuid=227d964b-e7f5-4bc8-94d5-28cf56197987&at=AB6BwCBX9UDz5IbeIE42grXIB63F:1697333163318'
+    response = requests.get(url, stream=True)
+
+    print(f'База данных не найдена. Загружаю...')
+
+    total_size = int(response.headers.get('content-length', 0))
+    total_size_in_mb = total_size / (1024 * 1024)  # переводим в мегабайты
+    block_size = 1024
+
+    with open(database_path, 'wb') as file:
+        downloaded = 0
+        for data in response.iter_content(block_size):
+            file.write(data)
+            downloaded += len(data)
+            downloaded_in_mb = downloaded / \
+                (1024 * 1024)  # переводим в мегабайты
+            print(
+                f'Загружено: {downloaded_in_mb:.2f} МБ / {total_size_in_mb:.2f} МБ', end='\r')
+
+    print(f'Файл {database_path} загружен успешно.')
+else:
+    print(f'Нашел бд {database_path}')
 
 
 class Database():
